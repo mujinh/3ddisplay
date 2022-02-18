@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<script>
+		function tz_xiangqing(){
+			window.location.href='/yy.html';
+		}
+		function tz_bilibili(){
+			window.location.href="https://www.bilibili.com/video/BV1b34y197ux?from=search&seid=283681307798002555&spm_id_from=333.337.0.0";
+		}
+		function tz_github(){
+			window.location.href="https://github.com/mujinh/three-DReconstruction";
+		}
+	</script>
+    
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三维重建 闻天楼艺院</title>
+    
+	<style>
+       *{
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+
+       body{
+           height: 100vh;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+		   background: url("bgpic1.png") ; 
+		   background-size: 100% 100%;
+		   padding-top: 10%;
+       }
+
+       .anniu,.anniu::after{
+           font-family: 'Do Hyeon', sans-serif;
+           width: 180px;
+           height: 30px;
+           text-align: center;
+		   align-items: center;
+           font-size:14px;
+           line-height: 30px;
+           color: rgb(255, 255, 255);
+           background: linear-gradient(30deg,transparent 10%,rgba(41, 248, 110, 0.7) 10% 95%,  rgb(0, 161, 214,0.7) 95%);
+           box-shadow: 5px 0 0 rgb(37, 42, 47,0.7);
+           cursor: pointer;
+           position: relative;
+		   margin-top: 0%;
+       }
+
+       .anniu::after{
+           content: '查看模型';
+           position: absolute;
+           top: 0;
+           left: 0;
+           text-shadow: -5px -2px 0 rgb(37, 42, 47),
+           5px 2px 0 rgb(0, 161, 214) ;
+           visibility: hidden;
+          
+       } 
+       .anniu:hover::after{
+           animation: san 1s ; 
+           animation-timing-function: steps(1, end);
+       }
+
+	   .anniu1,.anniu1::after{
+           font-family: 'Do Hyeon', sans-serif;
+           width: 180px;
+           height: 30px;
+           text-align: center;
+		   align-items: center;
+           font-size: 14px;
+           line-height: 30px;
+           color: rgb(255, 251, 251);
+		   background: linear-gradient(30deg,transparent 10%,rgba(37, 42, 47,0.7) 10% 95%,  rgb(41, 248, 110, 0.7) 95%);
+           box-shadow: 5px 0 0 rgb(0, 161, 214,0.7);
+           cursor: pointer;
+           position: relative;
+		   margin-top: 0%;	
+       }
+
+       .anniu1::after{
+           content: '文档介绍';
+           position: absolute;
+           top: 0;
+           left: 0;
+           text-shadow: -5px -2px 0 rgb(0, 161, 214),
+           5px 2px 0 rgb(0, 255, 115) ;
+           visibility: hidden;
+          
+       } 
+       .anniu1:hover::after{
+           animation: san 1s ; 
+           animation-timing-function: steps(1, end);
+       }
+
+
+	   .anniu2,.anniu2::after{
+           font-family: 'Do Hyeon', sans-serif;
+           width: 180px;
+           height: 30px;
+           text-align: center;
+		   align-items: center;
+           font-size: 14px;
+           line-height: 30px;
+           color: rgb(255, 251, 251);
+           background: linear-gradient(30deg,transparent 10%,rgba(0, 161, 214,0.7) 10% 95%,  rgb(37, 42, 47,0.7) 95%);
+           box-shadow: 5px 0 0 rgb(41, 248, 110, 0.7);
+           cursor: pointer;
+           position: relative;
+		   margin-top: 0%;
+       }
+
+       .anniu2::after{
+           content: '一键三连';
+           position: absolute;
+           top: 0;
+           left: 0;	
+           text-shadow: -5px -2px 0 rgb(41, 248, 110),
+           5px 2px 0 rgb(37, 42, 47) ;
+           visibility: hidden;
+          
+       } 
+       .anniu2:hover::after{
+           animation: san 1s ; 
+           animation-timing-function: steps(1, end);
+       }
+
+
+       @keyframes san{
+           0%{
+            clip-path: inset(20% -5px  60%  0);
+            transform: translate(-6px,5px);
+            visibility: visible;
+           }
+           10%{
+            clip-path: inset(50% -5px  30%  0);
+            transform: translate(6px,-5px);
+           }
+           20%{
+            clip-path: inset(20% -5px  60%  0);
+            transform: translate(5px,0px);
+
+            }
+            30%{
+                clip-path: inset(80% -5px  5%  0);
+            transform: translate(-8px,5px);
+            }
+            40%{
+                clip-path: inset(0 -5px  80%  0);
+            transform: translate(-4px,-3px);
+
+            }
+            50%{
+                clip-path: inset(50% -5px  30%  0);
+            transform: translate(-6px,-5px);
+            }
+            60%{
+                clip-path: inset(80% -5px  5%  0);
+            transform: translate(-7px,5px);
+
+            }
+            70%{
+                clip-path: inset(0 -5px  80%  0);
+            transform: translate(3px,6px);
+            }
+            80%{
+                clip-path: inset(50% -5px  30%  0);
+            transform: translate(5px,5px);
+
+            }
+            90%{
+                clip-path: inset(20% -5px  60%  0);
+            transform: translate(6px,-5px);
+
+            }
+            100%{
+                clip-path: inset(0 -5px  80%  0);
+            transform: translate(1px,5px);
+
+            }
+       }
+    </style>
+    <!-- 图标 -->
+    <link rel="icon" href="sdu.jpg">
+</head>
+<body>
+	<div class="anniubox">
+		<div onclick="tz_xiangqing()"  class="anniu">START !</div>
+		<div onclick="tz_github()"  class="anniu1">github</div>
+    	<div onclick="tz_bilibili()"  class="anniu2">bilibili</div>
+
+	</div>
+	<p style="background:none;height: 5%;position: fixed;bottom: 0px;width: 100%;text-align: center;font-size: 12px;">
+    	<a class="banquan" style="color:rgb(75, 73, 73);" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=2022004189" target="_blank">鲁ICP备2022004189号</a>
+	</p>
+    
+</body>
+
+</html>

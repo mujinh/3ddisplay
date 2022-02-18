@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>闻天楼白模</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<link rel="icon" href="sdu.jpg">
+		<style>
+			#glFullscreen {
+				width: 100%;
+				height: 100vh;
+				min-width: 640px;
+				min-height: 360px;
+				position: relative;
+				overflow: hidden;
+				z-index: 0;
+			}
+			#example {
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				background-color: #000000;
+			}
+			#feedback {
+				color: darkorange;
+			}
+			#dat {
+				user-select: none;
+				position: absolute;
+				left: 0;
+				top: 0;
+				z-Index: 200;
+			}
+			#info1 {
+				display: none;
+				position: absolute;
+				width: 150px;
+				height: 80px;
+				text-align: left;
+				z-index: 100;
+				padding: 10px;
+				background: rgba(255, 255, 255, 0.6);
+				line-height: 1.2;
+				border-radius: 5px;
+				font-weight: bold;
+			}
+            #info2 {
+				display: none;
+				position: absolute;
+				width: 150px;
+				height: 25px;
+				text-align: center;
+				z-index: 100;
+				padding: 10px;
+				background: rgba(255, 255, 255, 0.6);
+				border-radius: 5px;
+				font-weight: bold;
+			}
+			#buttonbox {
+                position: absolute;
+                top: 0px;
+                right:0px;
+                height: 170px;
+                width: 170px;
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-around;
+            }
+			#button1 {
+				position: absolute;
+				text-align: center;
+				z-index: 200;
+				padding: 10px;
+				background: rgba(255, 255, 255, 0.6);
+				border-radius: 5px;
+				font-weight: bold;
+			}
+		</style>
+
+	</head>
+
+	<body>
+        <!-- WebGL 的主要实现就去用这个 canvas 去绘制 -->
+		<div id="glFullscreen">
+			<canvas id="example"></canvas>
+            <!-- <canvas>元素可被用来通过JavaScript（Canvas API 或 WebGL API）绘制图形及图形动画。 -->
+		</div>
+		<div id="dat">
+
+		</div>
+		<div id="info">
+			<div>闻天楼白膜展示</div>
+			<div>鼠标左键点击显示物体信息(共9种)</div>
+			<div>鼠标左键长按旋转，滚轮缩放，右键长按平移</div>
+			<div id="feedback"></div>
+		</div>
+		<div id = "buttonbox">
+            <div><button onclick="window.location.href='/yy.html'" class="button1">点击查看艺术院白模</button></div>
+            <div><button onclick="window.location.href='/yypcd.html'" class="button1">点击查看艺术院点云</button></div>
+            <div><button onclick="window.location.href='/yypcdjianban.html'" class="button1">点击查看艺术院简版</button></div>
+			<div><button onclick="window.location.href='/wtlpcd.html'" class="button1">点击查看闻天楼点云</button></div>
+			<div><button onclick="window.location.href='/wtlpcdjianban.html'" class="button1">点击查看闻天楼简版</button></div>
+        </div>
+		<div id="info1"></div>
+        <div id="info2"></div>
+
+		<script type="module">
+
+			'use strict';
+            // 导入 threejs 核心库
+			import * as THREE from '/build/three.module.js';
+            // 导入 camera controller，用于响应鼠标/手指的拖动，放大，旋转等操作
+			import { TrackballControls } from "/examples/jsm/controls/TrackballControls.js";
+			// 使用TrackballControls控制相机,可参考https://blog.csdn.net/qw8704149/article/details/114165119
+
+			import { MTLLoader } from "/examples/jsm/loaders/MTLLoader.js";
+			import { OBJLoader2 } from "/examples/jsm/loaders/OBJLoader2.js";
+			import { MtlObjBridge } from "/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js";
+
+            // 添加了注释简要介绍了各个属性的作用，总体来说就是3D场景，3D 相机，相机控制器以及最重要的渲染器，渲染器绑定了 canvas
+            // 3D 场景及其所有的物件都会通过这个渲染器渲染到 canvas 中去
+			const OBJLoader2Example = function ( elementToBindTo ) {
+				this.renderer = null;   // 渲染器，后面它会绑定 canvas 节点
+				this.canvas = elementToBindTo;  // canvas 节点
+				this.aspectRatio = 1;   // 视图比例
+				this.recalcAspectRatio();
+
+				this.scene = null;  // 3D 场景
+				this.cameraDefaults = { // 默认相机参数
+					posCamera: new THREE.Vector3( 200.0, 200.0, 600.0 ),  // 相机的位置
+					posCameraTarget: new THREE.Vector3( 0, 0, 0 ),  // 相机的目标
+					near: 0.1,  // 近截面
+					far: 2000, // 远截面
+					fov: 60 // 视景体夹角
+				};
+				this.camera = null; // 3D 相机
+				this.cameraTarget = this.cameraDefaults.posCameraTarget;    // 3D 相机的目标，就是相机该盯着哪里看
+				this.controls = null;   // 3D 相机控制器，当然也可理解就是一个手势控制器
+				this.clickObjects = [];
+				this.raycaster = new THREE.Raycaster();
+				this.mouse = new THREE.Vector2();
+				// this.textBox = document.querySelector('.text')
+			};
+
+			OBJLoader2Example.prototype = {
+                // 定义OBJLoader2Example
+				constructor: OBJLoader2Example,
+				// 初始化
+				initGL: function () {
+					this.renderer = new THREE.WebGLRenderer( {  // 创建渲染器
+						canvas: this.canvas,    // 绑定 canvas
+						antialias: true,    // 抗锯齿
+						autoClear: true
+					} );
+					this.renderer.setClearColor( 0x000000 );
+
+					this.scene = new THREE.Scene();
+                    // 初始化透视投影相机，这是一个三角的景锥体，物体在其里面呈现的效果是近大远小
+					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
+					this.resetCamera();
+                    // 初始化 controller
+					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
+
+                    // 添加环境光与平行光
+					let ambientLight = new THREE.AmbientLight( 0x404040 );
+					let directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
+					let directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
+
+					directionalLight1.position.set( - 200, - 100, 200 );
+					directionalLight2.position.set( 200, 100, - 200 );
+
+					this.scene.add( directionalLight1 );
+					this.scene.add( directionalLight2 );
+					this.scene.add( ambientLight );
+                    // 添加调试网格
+					let helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
+					this.scene.add( helper );
+					
+				},
+
+                // 内容加载，其主要是通过 ObjLoader2 先是加载了材质然后加载模型
+				initContent: function () {
+					let modelName = '闻天楼白模';
+					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
+
+
+					let scope = this;
+					let objLoader2 = new OBJLoader2();  // 声明 ObjLoader2 对象
+                    // 模型加载完成的callbackOnLoad函数，加载完成后便会把模型加载到场景中
+					let callbackOnLoad = function ( object3d ) {
+						scope.scene.add( object3d );
+						// console.log(scope.scene.children[4].children[0].geometry.attributes.position)
+						// console.log(scope.scene.children)
+						console.log( 'Loading complete: ' + modelName );
+						let obj1 = scope.scene.children[4].children[0]
+						scope.clickObjects.push(obj1);
+						console.log(scope.clickObjects)
+						scope._reportProgress( { detail: { text: '' } } );
+						scope.initThreeClickEvent();	
+					};
+					// 材质加载完成的回调，材质加载完成后便会进一步加载 obj
+					let onLoadMtl = function ( mtlParseResult ) {
+						objLoader2.setModelName( modelName );
+						objLoader2.setLogging( true, true );
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
+						objLoader2.load( 'models/wtlobj/wtl.obj', callbackOnLoad, null, null, null );	// 开始加载 obj
+					};
+					
+					let mtlLoader = new MTLLoader();	// 开始加载材质
+					mtlLoader.load( 'models/wtlobj/wtl.mtl', onLoadMtl );
+					
+				},
+
+				_reportProgress: function ( event ) {
+					let output = '';
+					if ( event.detail !== null && event.detail !== undefined && event.detail.text ) {
+						output = event.detail.text;
+					}
+					console.log( 'Progress: ' + output );
+					document.getElementById( 'feedback' ).innerHTML = output;
+				},
+
+				resizeDisplayGL: function () {
+					this.controls.handleResize();
+
+					this.recalcAspectRatio();
+					this.renderer.setSize( this.canvas.offsetWidth, this.canvas.offsetHeight, false );
+
+					this.updateCamera();
+				},
+
+				recalcAspectRatio: function () {
+					this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+				},
+
+				resetCamera: function () {
+					this.camera.position.copy( this.cameraDefaults.posCamera );
+					this.cameraTarget.copy( this.cameraDefaults.posCameraTarget );
+
+					this.updateCamera();
+				},
+
+				updateCamera: function () {
+					this.camera.aspect = this.aspectRatio;
+					this.camera.lookAt( this.cameraTarget );
+					this.camera.updateProjectionMatrix();
+				},
+
+				initThreeClickEvent: function() {
+					let scope = this;
+					document.getElementById(this.canvas.id).addEventListener('mousedown', onDocumentMouseDown, false);
+					document.getElementById(this.canvas.id).addEventListener("wheel", onDocumentMousewheel, false);
+					document.getElementById(this.canvas.id).addEventListener('click', onDocumentclick, false);
+					function onDocumentclick(event) {
+						console.log("2")
+						event.preventDefault();
+						scope.mouse.x = (event.clientX / scope.renderer.domElement.clientWidth) * 2 - 1;
+						scope.mouse.y = -(event.clientY / scope.renderer.domElement.clientHeight) * 2 + 1;
+						// console.log(scope.mouse)
+						scope.raycaster.setFromCamera(scope.mouse, scope.camera);
+						// console.log(scope.raycaster)
+
+
+						var intersects = scope.raycaster.intersectObjects(scope.clickObjects);
+						var obj2 = document.getElementById("info1");
+                        var obj4 = document.getElementById("info2");
+						if(intersects.length > 0){
+							if(intersects[0].face.materialIndex==1){xianshiwuti("道路",obj4,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==2){xianshiwuti("楼梯",obj4,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==3){xianshiwenben("窗户","1.6m","1m",obj2,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==4){xianshiwenben("玻璃幕墙","12m","5.4m",obj2,event.clientX,event.clientY)}
+                            else if(intersects[0].face.materialIndex==5){xianshiwuti("太阳能板",obj4,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==6){xianshiwuti("绿化",obj4,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==7){xianshiwuti("外机",obj4,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==8){xianshikongtiao("空调外机","80cm","60cm","20cm",obj2,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==9){xianshiwenben("窗户","1.6m","1.5m",obj2,event.clientX,event.clientY)}
+							else if(intersects[0].face.materialIndex==10){xianshiwenben("楼梯窗户","1.5m","1.5m",obj2,event.clientX,event.clientY)}
+						}
+						else if(intersects.length == 0){
+							//未选中物体时
+							obj2.style.display = "none";
+                            obj4.style.display = "none";
+						}
+					}
+					function onDocumentMouseDown(event) {
+						event.preventDefault();
+						var obj3 = document.getElementById("info1");
+                        var obj4 = document.getElementById("info2");
+						obj3.style.display = "none"
+                        obj4.style.display = "none";
+					}
+					function onDocumentMousewheel(event) {
+						event.preventDefault();
+						var obj3 = document.getElementById("info1");
+                        var obj4 = document.getElementById("info2");
+						obj3.style.display = "none"
+                        obj4.style.display = "none";
+					}
+					function xianshiwenben(txt1,txt2,txt3,obj2,X,Y){
+						obj2.style.left = X + 'px';
+						obj2.style.top = Y + 'px';
+						obj2.style.display = "inline-block"
+						obj2.innerHTML = '<span style="color:green;font-size: 15px">' + "物体名称：" + txt1 + '</span>'
+						+'<p style="font-size: 14px;color:black">' + "长：" + txt2 + '</p>'
+						+'<p style="font-size: 14px;color:black">'+ "宽：" + txt3 + '</p>'
+					}
+					function xianshikongtiao(txt1,txt2,txt3,txt4,obj2,X,Y){
+						obj2.style.left = X + 'px';
+						obj2.style.top = Y + 'px';
+						obj2.style.display = "inline-block"
+						obj2.innerHTML = '<span style="color:green;font-size: 15px">' + "物体名称：" + txt1 + '</span>'
+						+'<p style="font-size: 14px;color:black">' + "长：" + txt2 + "  宽:" + txt3 + '</p>'
+						+'<p style="font-size: 14px;color:black">'+ "高：" + txt4 + '</p>'
+					}
+                    function xianshiwuti(txt1,obj4,X,Y){
+                        obj4.style.left = X + 'px';
+						obj4.style.top = Y + 'px';
+						obj4.style.display = "inline-block"
+						obj4.innerHTML = '<span style="color:black;font-size: 15px">' + "物体名称：" + txt1 + '</span>'
+                    }
+				},
+
+				render: function () {
+					if ( !this.renderer.autoClear ) this.renderer.clear();
+					this.controls.update();
+					this.renderer.render( this.scene, this.camera );
+				}
+			};
+
+			let app = new OBJLoader2Example( document.getElementById( 'example' ) );
+			
+
+			let resizeWindow = function () {
+				app.resizeDisplayGL();
+			};
+
+            
+			let render = function () {
+				requestAnimationFrame( render );
+				app.render();
+			};
+
+			window.addEventListener( 'resize', resizeWindow, false );
+
+			console.log( 'Starting initialisation phase...' );
+			app.initGL();
+			app.resizeDisplayGL();
+			app.initContent();
+
+			render();
+
+		</script>
+	</body>
+</html>

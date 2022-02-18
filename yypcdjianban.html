@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - PCD</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<link rel="icon" href="sdu.jpg">
+		<style>
+			#buttonbox {
+                position: absolute;
+                top: 0px;
+                right:0px;
+                height: 170px;
+                width: 170px;
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-around;
+            }
+			#button1 {
+				position: absolute;
+				text-align: center;
+				z-index: 200;
+				padding: 10px;
+				background: rgba(255, 255, 255, 0.6);
+				border-radius: 5px;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<div>艺术楼简版点云展示</div>
+			<div>因点云点数较多，需要加载一两分钟，请耐心等待，谢谢</div>
+			<div>若想查看更清晰的完整版请查看闻天楼点云详版</div>
+			<div>鼠标左键长按旋转，滚轮缩放，右键长按平移</div>
+		</div>
+		<div id = "buttonbox">
+		    <div><button onclick="window.location.href='/yy.html'" class="button1">点击查看艺术院白模</button></div>
+            <div><button onclick="window.location.href='/wtl.html'" class="button1">点击查看闻天楼白模</button></div>
+            <div><button onclick="window.location.href='/yypcd.html'" class="button1">点击查看艺术院点云</button></div>
+            <div><button onclick="window.location.href='/wtlpcd.html'" class="button1">点击查看闻天楼点云</button></div>
+            <div><button onclick="window.location.href='/wtlpcdjianban.html'" class="button1">点击查看闻天楼简版</button></div>
+        </div>
+
+		<script type="module">
+
+			import * as THREE from '/build/three.module.js';
+
+			import Stats from '/examples/jsm/libs/stats.module.js';
+
+			import { TrackballControls } from '/examples/jsm/controls/TrackballControls.js';
+			import { PCDLoader } from '/examples/jsm/loaders/PCDLoader.js';
+
+			var container, stats;
+			var camera, controls, scene, renderer;
+
+			init();
+			animate();
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+
+				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
+				camera.position.set(0, 10, -20); //设置相机位置
+				camera.up.set( 0, 0, 1 );
+
+				scene.add( camera );
+				
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var loader = new PCDLoader();
+				
+				loader.load( '/models/pcd/yyint3.pcd', function ( points ) {
+					scene.add( points );
+					var center = points.geometry.boundingSphere.center;
+					controls.target.set( center.x, center.y, center.z );
+					controls.update();
+
+				} );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 2.0;
+				controls.zoomSpeed = 0.3;
+				controls.panSpeed = 0.2;
+
+				controls.staticMoving = true;
+
+				controls.minDistance = 0.3;
+				controls.maxDistance = 0.3 * 100;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>
